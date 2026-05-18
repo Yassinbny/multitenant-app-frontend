@@ -1,0 +1,39 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="128" height="128" rx="28" fill="url(#bg)"/>
+
+  <!-- Documento -->
+  <path d="M38 24H78L96 42V96C96 100.418 92.418 104 88 104H38C33.582 104 30 100.418 30 96V32C30 27.582 33.582 24 38 24Z" fill="white" fill-opacity="0.96"/>
+  <path d="M78 24V42H96" fill="#DCEBFF"/>
+
+  <!-- Lineas del parte -->
+  <rect x="44" y="52" width="36" height="5" rx="2.5" fill="#A7B7CC"/>
+  <rect x="44" y="64" width="28" height="5" rx="2.5" fill="#C3CEDB"/>
+  <rect x="44" y="76" width="40" height="5" rx="2.5" fill="#C3CEDB"/>
+
+  <!-- Coche -->
+  <path d="M42 89L47 78C48.089 75.604 50.477 74 53.11 74H74.89C77.523 74 79.911 75.604 81 78L86 89V96H42V89Z" fill="#2563EB"/>
+  <path d="M51 79H77L80 87H48L51 79Z" fill="#BFDBFE"/>
+  <circle cx="52" cy="96" r="5" fill="#1E293B"/>
+  <circle cx="76" cy="96" r="5" fill="#1E293B"/>
+
+  <!-- Alerta -->
+  <circle cx="91" cy="39" r="18" fill="#F97316"/>
+  <path d="M91 28L103 50H79L91 28Z" fill="white"/>
+  <rect x="89.5" y="36" width="3" height="8" rx="1.5" fill="#F97316"/>
+  <circle cx="91" cy="47" r="1.8" fill="#F97316"/>
+
+  <!-- Multi-tenant nodos -->
+  <circle cx="31" cy="35" r="5" fill="#22C55E"/>
+  <circle cx="22" cy="61" r="4" fill="#22C55E"/>
+  <circle cx="31" cy="87" r="5" fill="#22C55E"/>
+  <path d="M31 40V50C31 56.075 26.075 61 20 61" stroke="#86EFAC" stroke-width="3" stroke-linecap="round"/>
+  <path d="M31 82V72C31 65.925 26.075 61 20 61" stroke="#86EFAC" stroke-width="3" stroke-linecap="round"/>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F172A"/>
+      <stop offset="0.55" stop-color="#1D4ED8"/>
+      <stop offset="1" stop-color="#06B6D4"/>
+    </linearGradient>
+  </defs>
+</svg>
