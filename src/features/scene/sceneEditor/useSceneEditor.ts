@@ -1,6 +1,8 @@
 import { useState } from "react";
 import type { SceneElement, SceneElementType } from "../scene.types";
 
+// Centralized factory for creating scene elements with default visual properties.
+// Keeping this here prevents sizes, colors and labels from being scattered across UI components.
 const createElement = (type: SceneElementType): SceneElement => {
   const baseElement = {
     id: crypto.randomUUID(),
@@ -41,10 +43,11 @@ const createElement = (type: SceneElementType): SceneElement => {
 };
 
 export const useSceneEditor = () => {
-  //   elements is the main data model of the scene. Everything drawn on Konva and all the JSON comes from this array.
+  // elements is the main scene data model.
+  // Everything rendered by Konva and everything exported as JSON comes from this array.
   const [elements, setElements] = useState<SceneElement[]>([]);
 
-  //   We save only the selected id to keep the state small and stable. The actual selected element can be derived from the elements array and the selected id.
+  // Store only the selected id to keep the state small and stable.
   const [selectedElementId, setSelectedElementId] = useState<string | null>(
     null,
   );
@@ -56,7 +59,8 @@ export const useSceneEditor = () => {
     setSelectedElementId(element.id);
   };
 
-  //   update every editable property of the element without losing the rest. Used for changes like label, rotation or notes.
+  // Updates any editable element property without losing the rest.
+  // Used for changes such as label, rotation or notes.
   const updateElement = (
     id: string,
     updates: Partial<Omit<SceneElement, "id">>,
@@ -68,7 +72,7 @@ export const useSceneEditor = () => {
     );
   };
 
-  //   synchronices the canvas drag and drop with the JSON model.
+  // Synchronizes canvas drag and drop with the JSON model.
   const updateElementPosition = (id: string, x: number, y: number) => {
     setElements((currentElements) =>
       currentElements.map((element) =>
@@ -77,22 +81,26 @@ export const useSceneEditor = () => {
     );
   };
 
-  //   synchronizes the visual resize of the Transformer with persistent width/height.
+  // Synchronizes visual Transformer changes with persistent model values.
+  // Rotation is stored here as well because Konva applies it on the transformed node.
   const updateElementSize = (
     id: string,
     width: number,
     height: number,
     x: number,
     y: number,
+    rotation: number,
   ) => {
     setElements((currentElements) =>
       currentElements.map((element) =>
-        element.id === id ? { ...element, width, height, x, y } : element,
+        element.id === id
+          ? { ...element, width, height, x, y, rotation }
+          : element,
       ),
     );
   };
 
-  //   allows the JSON panel to replace the whole scene when valid JSON is applied.
+  // Allows the editable JSON panel to replace the whole scene when valid JSON is applied.
   const setElementsFromJson = (nextElements: SceneElement[]) => {
     setElements(nextElements);
     setSelectedElementId(null);

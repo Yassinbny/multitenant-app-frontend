@@ -42,6 +42,7 @@ type SceneCanvasProps = {
     height: number,
     x: number,
     y: number,
+    rotation: number,
   ) => void;
 };
 
@@ -52,9 +53,12 @@ export const SceneCanvas = ({
   onMoveElement,
   onResizeElement,
 }: SceneCanvasProps) => {
+  // The Transformer must attach to the whole element group, not the inner shape.
+  // This keeps position, resize and rotation synchronized.
   const transformerRef = useRef<Konva.Transformer>(null);
-  const shapeRefs = useRef<Record<string, Konva.Node>>({});
+  const elementRefs = useRef<Record<string, Konva.Node>>({});
 
+  // Whenever selection changes, attach the Transformer to the selected element group.
   useEffect(() => {
     const transformer = transformerRef.current;
 
@@ -63,15 +67,17 @@ export const SceneCanvas = ({
     }
 
     const selectedNode = selectedElementId
-      ? shapeRefs.current[selectedElementId]
+      ? elementRefs.current[selectedElementId]
       : null;
 
     transformer.nodes(selectedNode ? [selectedNode] : []);
     transformer.getLayer()?.batchDraw();
   }, [selectedElementId, elements]);
 
+  // Konva stores resize as scaleX/scaleY. We convert that temporary scale into
+  // real width/height values so the exported JSON remains explicit and stable.
   const handleTransformEnd = (element: SceneElement) => {
-    const node = shapeRefs.current[element.id];
+    const node = elementRefs.current[element.id];
 
     if (!node) {
       return;
@@ -82,18 +88,18 @@ export const SceneCanvas = ({
 
     const nextWidth = Math.max(10, element.width * scaleX);
     const nextHeight = Math.max(10, element.height * scaleY);
+    const nextRotation = node.rotation();
 
     node.scaleX(1);
     node.scaleY(1);
-
-    const group = node.getParent();
 
     onResizeElement(
       element.id,
       nextWidth,
       nextHeight,
-      group?.x() ?? element.x,
-      group?.y() ?? element.y,
+      node.x(),
+      node.y(),
+      nextRotation,
     );
   };
 
@@ -134,6 +140,11 @@ export const SceneCanvas = ({
               return (
                 <Group
                   key={element.id}
+                  ref={(node) => {
+                    if (node) {
+                      elementRefs.current[element.id] = node;
+                    }
+                  }}
                   x={element.x}
                   y={element.y}
                   rotation={element.rotation}
@@ -149,15 +160,11 @@ export const SceneCanvas = ({
                       event.target.y(),
                     );
                   }}
+                  onTransformEnd={() => handleTransformEnd(element)}
                 >
                   {element.type === "vehicle" ? (
-                    <Group>
+                    <>
                       <Rect
-                        ref={(node) => {
-                          if (node) {
-                            shapeRefs.current[element.id] = node;
-                          }
-                        }}
                         x={0}
                         y={0}
                         width={element.width}
@@ -166,7 +173,6 @@ export const SceneCanvas = ({
                         cornerRadius={8}
                         stroke={isSelected ? "#ffffff" : "#0f172a"}
                         strokeWidth={isSelected ? 3 : 1}
-                        onTransformEnd={() => handleTransformEnd(element)}
                       />
 
                       <Rect
@@ -223,15 +229,10 @@ export const SceneCanvas = ({
                         verticalAlign="middle"
                         listening={false}
                       />
-                    </Group>
+                    </>
                   ) : (
-                    <Group>
+                    <>
                       <Rect
-                        ref={(node) => {
-                          if (node) {
-                            shapeRefs.current[element.id] = node;
-                          }
-                        }}
                         x={0}
                         y={0}
                         width={element.width}
@@ -239,7 +240,6 @@ export const SceneCanvas = ({
                         fill={element.color}
                         stroke={isSelected ? "#ffffff" : "#0f172a"}
                         strokeWidth={isSelected ? 3 : 1}
-                        onTransformEnd={() => handleTransformEnd(element)}
                       />
 
                       <Text
@@ -254,7 +254,7 @@ export const SceneCanvas = ({
                         verticalAlign="middle"
                         listening={false}
                       />
-                    </Group>
+                    </>
                   )}
                 </Group>
               );
