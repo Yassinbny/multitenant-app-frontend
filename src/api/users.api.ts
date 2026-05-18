@@ -18,3 +18,9 @@ export const createUser = (input: CreateUserInput, token: string) => {
     token,
   });
 };
+export const deleteUser = (userId: string, token: string) => {
+  return baseApi<void>(`/users/${userId}`, {
+    method: "DELETE",
+    token,
+  });
+};

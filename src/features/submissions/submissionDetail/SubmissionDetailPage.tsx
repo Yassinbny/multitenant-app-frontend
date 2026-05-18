@@ -1,10 +1,22 @@
-import { Link, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import { formatDateTime } from "../../../utils/formatDate";
 import { useSubmission } from "./useSubmission";
+import { useDeleteSubmission } from "../deleteSubmission/useDeleteSubmission";
+import { Button } from "../../../components/ui/Button";
 
 export const SubmissionDetailPage = () => {
   const { id } = useParams();
+
   const { data, isLoading, isError, error } = useSubmission(id);
+
+  const navigate = useNavigate();
+
+  const deleteSubmissionMutation = useDeleteSubmission();
+
+  const handleDelete = () => {
+    deleteSubmissionMutation.mutate(submission.id);
+    navigate("/submissions");
+  };
 
   if (isLoading) {
     return <p className="text-sm text-slate-400">Cargando parte...</p>;
@@ -30,16 +42,26 @@ export const SubmissionDetailPage = () => {
         <div className="flex flex-row gap-3">
           <Link
             to="/submissions"
-            className="mt-4 inline-flex rounded-md bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
+            className="inline-flex cursor-pointer items-center justify-center rounded-md px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 bg-cyan-400 text-slate-950 hover:bg-cyan-300"
           >
             Volver a partes
           </Link>
           <Link
             to={`/submissions/${submission.id}/scene`}
-            className="mt-4 inline-flex rounded-md bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
+            className="inline-flex cursor-pointer items-center justify-center rounded-md px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 bg-cyan-400 text-slate-950 hover:bg-cyan-300"
           >
             Ver/editar escena
           </Link>
+          <Button
+            type="button"
+            variant="danger"
+            onClick={handleDelete}
+            disabled={deleteSubmissionMutation.isPending}
+          >
+            {deleteSubmissionMutation.isPending
+              ? "Eliminando..."
+              : "Eliminar parte"}
+          </Button>
         </div>
 
         <h1 className="mt-3 text-2xl font-semibold">

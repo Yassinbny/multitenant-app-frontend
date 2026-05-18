@@ -1,9 +1,12 @@
-import { CreateUserForm } from "../createUsers/CreateUserForm";
+import { Button } from "../../../components/ui/Button";
 import { formatDate } from "../../../utils/formatDate";
+import { CreateUserForm } from "../createUsers/CreateUserForm";
+import { useDeleteUser } from "../deleteUser/useDeleteUser";
 import { useUsers } from "./useUsers";
 
 export const UsersPage = () => {
   const { data, isLoading, isError, error } = useUsers();
+  const deleteUserMutation = useDeleteUser();
 
   return (
     <section>
@@ -35,6 +38,7 @@ export const UsersPage = () => {
                 <th className="px-4 py-3 font-medium">Email</th>
                 <th className="px-4 py-3 font-medium">Rol</th>
                 <th className="px-4 py-3 font-medium">Creado</th>
+                <th className="px-4 py-3 font-medium">Accion</th>
               </tr>
             </thead>
 
@@ -46,13 +50,32 @@ export const UsersPage = () => {
                   <td className="px-4 py-3 text-slate-400">
                     {formatDate(user.createdAt)}
                   </td>
+                  <td className="px-4 py-3">
+                    <Button
+                      type="button"
+                      variant="danger"
+                      className="px-2 py-1 text-xs"
+                      disabled={deleteUserMutation.isPending}
+                      onClick={() => {
+                        if (
+                          window.confirm(
+                            "¿Seguro que quieres eliminar este usuario?",
+                          )
+                        ) {
+                          deleteUserMutation.mutate(user.id);
+                        }
+                      }}
+                    >
+                      Eliminar
+                    </Button>
+                  </td>
                 </tr>
               ))}
 
               {data?.users.length === 0 && (
                 <tr className="bg-slate-950">
                   <td
-                    colSpan={3}
+                    colSpan={4}
                     className="px-4 py-6 text-center text-sm text-slate-400"
                   >
                     Todavia no hay usuarios registrados.
@@ -62,6 +85,14 @@ export const UsersPage = () => {
             </tbody>
           </table>
         </div>
+      )}
+
+      {deleteUserMutation.isError && (
+        <p className="mt-3 text-sm text-red-400">
+          {deleteUserMutation.error instanceof Error
+            ? deleteUserMutation.error.message
+            : "No se pudo eliminar el usuario"}
+        </p>
       )}
     </section>
   );

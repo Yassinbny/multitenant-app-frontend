@@ -32,3 +32,9 @@ export const createTenantAdmin = (
     token,
   });
 };
+export const deleteTenant = (tenantId: string, token: string) => {
+  return baseApi<void>(`/tenants/${tenantId}`, {
+    method: "DELETE",
+    token,
+  });
+};

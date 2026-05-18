@@ -24,10 +24,16 @@ export const baseApi = async <T>(
     body: options.body ? JSON.stringify(options.body) : undefined,
   });
 
-  const data = await response.json();
+  const hasBody = response.status !== 204;
+  const data = hasBody ? await response.json() : null;
 
   if (!response.ok) {
-    throw new Error(data.message ?? "Request failed");
+    const message =
+      data && typeof data === "object" && "message" in data
+        ? String(data.message)
+        : "Request failed";
+
+    throw new Error(message);
   }
 
   return data as T;

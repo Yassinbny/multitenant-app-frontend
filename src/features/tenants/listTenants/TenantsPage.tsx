@@ -1,10 +1,13 @@
+import { Button } from "../../../components/ui/Button";
+import { formatDate } from "../../../utils/formatDate";
 import { CreateTenantForm } from "../createTenant/CreateTenantForm";
 import { CreateTenantAdminForm } from "../createTenantAdmin/CreateTenantAdminForm";
-import { formatDate } from "../../../utils/formatDate";
+import { useDeleteTenant } from "../deleteTenant/useDeleteTenant";
 import { useTenants } from "./useTenants";
 
 export const TenantsPage = () => {
   const { data, isLoading, isError, error } = useTenants();
+  const deleteTenantMutation = useDeleteTenant();
 
   return (
     <section>
@@ -41,16 +44,30 @@ export const TenantsPage = () => {
               key={tenant.id}
               className="rounded-lg border border-slate-800 bg-slate-900 p-4"
             >
-              <div>
-                <p className="text-lg font-semibold text-slate-100">
-                  {tenant.name}
-                </p>
-                <p className="mt-1 break-all text-xs text-slate-500">
-                  {tenant.id}
-                </p>
-                <p className="mt-2 text-sm text-slate-400">
-                  Creado: {formatDate(tenant.createdAt)}
-                </p>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-lg font-semibold text-slate-100">
+                    {tenant.name}
+                  </p>
+                  <p className="mt-1 break-all text-xs text-slate-500">
+                    {tenant.id}
+                  </p>
+                  <p className="mt-2 text-sm text-slate-400">
+                    Creado: {formatDate(tenant.createdAt)}
+                  </p>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="danger"
+                  className="shrink-0 px-3 py-2 text-xs"
+                  disabled={deleteTenantMutation.isPending}
+                  onClick={() => {
+                    deleteTenantMutation.mutate(tenant.id);
+                  }}
+                >
+                  Eliminar
+                </Button>
               </div>
 
               <div className="mt-4 border-t border-slate-800 pt-4">
@@ -62,6 +79,14 @@ export const TenantsPage = () => {
             </article>
           ))}
         </div>
+      )}
+
+      {deleteTenantMutation.isError && (
+        <p className="mt-3 text-sm text-red-400">
+          {deleteTenantMutation.error instanceof Error
+            ? deleteTenantMutation.error.message
+            : "No se pudo eliminar el tenant"}
+        </p>
       )}
     </section>
   );

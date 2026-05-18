@@ -52,3 +52,9 @@ export const updateSubmissionScene = (
     },
   );
 };
+export const deleteSubmission = (submissionId: string, token: string) => {
+  return baseApi<void>(`/submissions/${submissionId}`, {
+    method: "DELETE",
+    token,
+  });
+};
